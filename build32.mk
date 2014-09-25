@@ -12,7 +12,7 @@ CXX_SHARED_CFLAGS = -g -shared -W1,-soname,libscribewrapper.so.1
 CXX_EXEC_CFLAGS = -Wall -g
 CXX_EXEC_LDFLAGS = -lboost_program_options -lboost_iostreams -lthrift -lfb303 -lscribe -lscribewrapper
 CXX_INCLUDES = $(THRIFT_INCLUDES) -I$(CURRENT_DIR)
-CXX_LIB_CFLAGS = -Wall -g -fPIC -pipe -m32
+CXX_LIB_CFLAGS = -Wall -g -fPIC -pipe -m32 -DHAVE_INTTYPES_H -DHAVE_NETINET_IN_H
 LIB_DIR = /usr/lib
 
 all: clean init $(LIBRARY) lib_install $(EXEC_STDIN) $(EXEC_TAIL)

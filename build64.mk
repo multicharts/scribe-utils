@@ -10,10 +10,10 @@ THRIFT_INCLUDES = -I/usr/include/thrift -I/usr/include/thrift/fb303
 CXX = g++
 CXX_SHARED_CFLAGS = -g -shared -W1,-soname,libscribewrapper.so.1
 CXX_EXEC_CFLAGS = -Wall -g
-CXX_EXEC_LDFLAGS = -lboost_program_options -lboost_iostreams -lthrift -lfb303 -lscribe -lscribewrapper
+CXX_EXEC_LDFLAGS = -lscribewrapper -lscribe -lfb303 -lthrift -lboost_iostreams -lboost_program_options -DHAVE_INTTYPES_H -DHAVE_NETINET_IN_H
 CXX_INCLUDES = $(THRIFT_INCLUDES) -I$(CURRENT_DIR)
-CXX_LIB_CFLAGS = -Wall -g -fPIC -pipe -m64
-LIB_DIR = /usr/lib64
+CXX_LIB_CFLAGS = -Wall -g -fPIC -pipe -m64 -DHAVE_INTTYPES_H -DHAVE_NETINET_IN_H
+LIB_DIR = /usr/lib/x86_64-linux-gnu
 
 all: clean init $(LIBRARY) lib_install $(EXEC_STDIN) $(EXEC_TAIL)
 
@@ -27,10 +27,10 @@ $(LIBRARY): $(SRC_DIR)/scribe_wrapper.o
 	$(CXX) $(CXX_SHARED_CFLAGS) $< -o $(BUILD_DIR)/$@ 
 
 $(EXEC_STDIN): $(SRC_DIR)/scribe_stdin.cpp
-	$(CXX) $(CXX_INCLUDES) $(CXX_EXEC_LDFLAGS) $< -o $(BUILD_DIR)/$@
+	$(CXX) $(CXX_INCLUDES) $< -o $(BUILD_DIR)/$@ $(CXX_EXEC_LDFLAGS) 
 
 $(EXEC_TAIL): $(SRC_DIR)/scribe_tail.cpp
-	$(CXX) $(CXX_INCLUDES) $(CXX_EXEC_LDFLAGS) $< -o $(BUILD_DIR)/$@
+	$(CXX) $(CXX_INCLUDES) $< -o $(BUILD_DIR)/$@ $(CXX_EXEC_LDFLAGS) 
 
 lib_install:
 	cp $(BUILD_DIR)/$(LIBRARY) $(LIB_DIR)/$(LIBRARY)
