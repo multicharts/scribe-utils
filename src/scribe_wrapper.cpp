@@ -114,13 +114,9 @@ int scribeWrapper::send(const std::string& message) {
 	counters["msg"]++;
 
 	LogEntry entry;
-	std::string msg;
 	entry.category = category;
-	if(debug) {
-		msg += debug_message();
-	}
-	msg += message + "\n"; //Special handling to include new lines
-	entry.message = msg;
+	entry.message = debug ? debug_message() + message : message;
+
 	std::vector<LogEntry> messages;
 	messages.push_back(entry);
 	ResultCode result = TRY_LATER;

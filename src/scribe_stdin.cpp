@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	scribeWrapper client(host, port, timeout, category, debug, log);
 	while(std::cin) {
 		getline(std::cin, message);
-		boost::algorithm::trim(message);
+		boost::algorithm::trim_right(message);
 		if(message.empty()) {
 			continue;
 		}
