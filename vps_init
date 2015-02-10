@@ -23,7 +23,7 @@ apt-get -y install puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1
 apt-get -y install ruby2.1 vim lxc-docker
 #setup configs
 mkdir -p /etc/facter/facts.d
-sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS="--insecure-registry=0.0.0.0/0 --iptables=false"|' /etc/default/docker
+sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS="--insecure-registry=0.0.0.0/0 --iptables=false -r=false"|' /etc/default/docker
 cat > /etc/facter/facts.d/facts.yaml << EOF
 ---
 role: proxy

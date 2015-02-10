@@ -34,6 +34,11 @@ cat > /etc/facter/facts.d/facts.yaml << EOF
 role: $ROLE
 location: $LOCATION
 EOF
+cat > /root/.ssh/config << EOF
+Host *
+ForwardAgent yes
+StrictHostKeyChecking no
+EOF
 cat > /etc/resolv.conf << EOF
 nameserver $(hostname -I | awk '{print $1}') 
 nameserver 8.8.8.8
