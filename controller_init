@@ -1,4 +1,6 @@
 #!/bin/bash
+set -x
+exec > /var/log/postinstall.log 2>&1
 DOMAIN="tvcloud"
 ROLE="sl-controller"
 LOCATION="softlayer"
