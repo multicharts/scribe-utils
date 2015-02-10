@@ -53,8 +53,7 @@ $(hostname -I | awk '{print $1}') registry ldap
 EOF
 #puppet configuration
 rm -rf /etc/puppet
-git clone git@github.com:multicharts/hardware-puppet.git /etc/puppet
-$(cd /etc/puppet && git submodule update --init)
+mkdir -p /etc/puppet
 cat > /etc/puppet/puppet.conf << EOF
 [main]
 logdir=/var/log/puppet
@@ -72,4 +71,3 @@ chmod -R g+w /etc/puppet
 puppet apply -v /etc/puppet/manifests/site.pp
 #reboot
 reboot
-
