@@ -1,0 +1,68 @@
+#!/bin/bash
+DOMAIN="tvcloud"
+ROLE="sl-controller"
+LOCATION="softlayer"
+apt-get -y update
+apt-get -y install python-software-properties curl wget mc
+if [ ! -e /usr/lib/apt/methods/https ]; then
+	apt-get install -y apt-transport-https
+fi
+echo "add Docker repo" >> /var/log/provision.log
+echo deb https://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+echo "add Ruby repo" >> /var/log/provision.log
+apt-add-repository -y ppa:brightbox/ruby-ng
+echo "add Puppet repo" >> /var/log/provision.log
+wget https://apt.puppetlabs.com/puppetlabs-release-precise.deb
+dpkg -i puppetlabs-release-precise.deb
+echo "add Kernel repo" >> /var/log/provision.log
+grep security /etc/apt/sources.list | grep main | sed 's/precise/trusty/' | sudo tee /etc/apt/sources.list.d/trusty-security.list
+echo 'APT::Default-Release "precise";' > /etc/apt/apt.conf.d/01ubuntu
+#install tools
+apt-get -y update
+apt-get -y upgrade
+apt-get -y install linux-headers-3.16.0-29-generic linux-image-3.16.0-29-generic linux-image-extra-3.16.0-29-generic
+apt-get -y install puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1
+apt-get -y install ruby2.1 vim lxc-docker
+#pull image
+docker pull registry:0.8.1
+#setup configs
+sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS="--insecure-registry=0.0.0.0/0 --iptables=false -r=false"|' /etc/default/docker
+mkdir -p /etc/facter/facts.d
+cat > /etc/facter/facts.d/facts.yaml << EOF
+---
+role: $ROLE
+location: $LOCATION
+EOF
+cat > /etc/resolv.conf << EOF
+nameserver $(hostname -I | awk '{print $1}') 
+nameserver 8.8.8.8
+search $DOMAIN
+EOF
+cat > /etc/hosts << EOF
+127.0.0.1	localhost.localdomain localhost
+$(hostname -I | awk '{print $1}') $(hostname) $(hostname).$DOMAIN
+$(hostname -I | awk '{print $1}') registry ldap
+EOF
+#puppet configuration
+rm -rf /etc/puppet
+git clone git@github.com:multicharts/hardware-puppet.git /etc/puppet
+$(cd /etc/puppet && git submodule update --init)
+cat > /etc/puppet/puppet.conf << EOF
+[main]
+logdir=/var/log/puppet
+vardir=/var/lib/puppet
+ssldir=/var/lib/puppet/ssl
+rundir=/var/run/puppet
+server=puppet
+
+[agent]
+server=puppet
+EOF
+chown -R root:puppet /etc/puppet
+chmod -R g+w /etc/puppet
+#apply puppet
+puppet apply -v /etc/puppet/manifests/site.pp
+#reboot
+reboot
+
