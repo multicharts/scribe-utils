@@ -26,7 +26,7 @@ mkdir -p /etc/facter/facts.d
 sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS="--insecure-registry=0.0.0.0/0 --iptables=false -r=false"|' /etc/default/docker
 cat > /etc/facter/facts.d/facts.yaml << EOF
 ---
-role: proxy
+role: 
 location: softlayer
 EOF
 cat > /etc/resolv.conf << EOF
