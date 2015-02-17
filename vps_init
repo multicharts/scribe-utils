@@ -1,4 +1,10 @@
 #!/bin/bash
+DOMAIN="softlayer"
+ROLE="compute"
+LOCATION="softlayer"
+NAMESERVER1="10.124.148.202"
+NAMESERVER2="10.124.148.203"
+NAMESERVER3="10.124.148.204"
 apt-get -y update
 apt-get -y install python-software-properties curl wget mc
 if [ ! -e /usr/lib/apt/methods/https ]; then
@@ -26,17 +32,18 @@ mkdir -p /etc/facter/facts.d
 sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS="--insecure-registry=0.0.0.0/0 --iptables=false -r=false"|' /etc/default/docker
 cat > /etc/facter/facts.d/facts.yaml << EOF
 ---
-role: 
-location: softlayer
+role: $ROLE
+location: $LOCATION 
 EOF
 cat > /etc/resolv.conf << EOF
-nameserver 10.33.68.136
-nameserver 8.8.8.8
-search tvcloud
+nameserver $NAMESERVER1
+nameserver $NAMESERVER2
+nameserver $NAMESERVER3
+search $DOMAIN 
 EOF
 cat > /etc/hosts << EOF
 127.0.0.1	localhost.localdomain localhost
-$(hostname -I | awk '{print $1}') $(hostname) $(hostname).tvcloud
+$(hostname -I | awk '{print $1}') $(hostname) $(hostname).$DOMAIN
 EOF
 cat > /etc/puppet/puppet.conf << EOF
 [main]
