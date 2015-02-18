@@ -24,8 +24,9 @@ echo 'APT::Default-Release "precise";' > /etc/apt/apt.conf.d/01ubuntu
 apt-get -y update
 apt-get -y upgrade
 apt-get -y install linux-headers-3.16.0-29-generic linux-image-3.16.0-29-generic linux-image-extra-3.16.0-29-generic
-apt-get -y install puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1
+apt-get -y install puppet=3.6.2-1puppetlabs1 puppet-common=3.6.2-1puppetlabs1 puppetmaster=3.6.2-1puppetlabs1 puppetmaster-common=3.6.2-1puppetlabs1
 apt-get -y install ruby2.1 vim lxc-docker
+gem install deep_merge
 #pull image
 docker pull registry:0.8.1
 #setup configs
