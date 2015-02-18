@@ -57,14 +57,21 @@ rm -rf /etc/puppet
 mkdir -p /etc/puppet
 cat > /etc/puppet/puppet.conf << EOF
 [main]
-logdir=/var/log/puppet
-vardir=/var/lib/puppet
-ssldir=/var/lib/puppet/ssl
-rundir=/var/run/puppet
-server=puppet
+logdir = /var/log/puppet
+rundir = /var/run/puppet
+ssldir = $vardir/ssl
+ca_server = puppet
+pluginsync = false
+pluginsync = true
 
+[master]
+certname = puppet
+ca = true
+     
 [agent]
 server=puppet
+classfile = $vardir/classes.txt
+localconfig = $vardir/localconfig
 EOF
 chown -R root:puppet /etc/puppet
 chmod -R g+w /etc/puppet
