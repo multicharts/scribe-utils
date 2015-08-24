@@ -30,7 +30,7 @@ gem install deep_merge
 #pull image
 docker pull registry:0.8.1
 #setup configs
-sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS="--insecure-registry=0.0.0.0/0 --iptables=false -r=false"|' /etc/default/docker
+sed -i 's|#DOCKER_OPTS=".*$|DOCKER_OPTS=" -H unix:///var/run/docker.sock  --insecure-registry registry:5000 --insecure-registry registry.tvbs:5000 --insecure-registry registry.tradingview.com:5000"|' /etc/default/docker
 mkdir -p /etc/facter/facts.d
 cat > /etc/facter/facts.d/facts.yaml << EOF
 ---
