@@ -5,7 +5,7 @@
 using std::string;
 using boost::shared_ptr;
 
-void metrics_writer(std::string filename, unsigned int interval, unsigned int * counter)
+void metrics_writer(std::string filename, unsigned int interval, std::string key, unsigned int * counter)
 {
   while (true) {
       boost::posix_time::seconds workTime(interval);
@@ -14,7 +14,7 @@ void metrics_writer(std::string filename, unsigned int interval, unsigned int * 
       metricsFile.open (filename.c_str());
       if (metricsFile.fail()) 
 	std::cerr << "can't open metrics file: " << filename << std::endl;
-      metricsFile << "scribe_stdin.message.count = " << *counter << std::endl;
+      metricsFile << key << " = " << *counter << std::endl;
       metricsFile.close();
     }
 }
@@ -29,7 +29,8 @@ int main(int argc, char **argv) {
 	std::string log;
 	std::string category; 
 	std::string message;
-	std::string metrics;
+	std::string metrics_file;
+	std::string metrics_key;
 	unsigned int message_count = 0;
 
 	try {
@@ -38,8 +39,9 @@ int main(int argc, char **argv) {
 			("help", "Print help")
 			("host", boost::program_options::value<std::string>(&host)->default_value("127.0.0.1"), "Scribe hostname")
 			("port", boost::program_options::value<unsigned int>(&port)->default_value(1463), "Scribe port")
-		        ("metrics", boost::program_options::value<std::string>(&metrics)->default_value("/tmp/scribe_stdin_metrics"), "Metrics file")
-			("metrics_interval", boost::program_options::value<unsigned int>(&metrics_interval)->default_value(30), "Metrics interval in seconds")
+		        ("metrics_file", boost::program_options::value<std::string>(&metrics_file)->default_value("/tmp/scribe_stdin_metrics"), "Metrics file")
+			("metrics_interval", boost::program_options::value<unsigned int>(&metrics_interval)->default_value(30), "Metrics file update interval in seconds")
+  		        ("metrics_key", boost::program_options::value<std::string>(&metrics_key)->default_value("msg.count"), "Metrics key")
 			("timeout", boost::program_options::value<unsigned int>(&timeout)->default_value(30), "timeout")
 			("debug", boost::program_options::value<bool>(&debug)->default_value(false), "Enable debug mode")		
 			("log", boost::program_options::value<std::string>(&log)->default_value("/tmp/scribewrapper.log"), "Path to scribe log file")		
@@ -59,7 +61,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 	// start metrics writer thread
-	boost::thread workerThread(metrics_writer, metrics, metrics_interval, &message_count);
+	boost::thread workerThread(metrics_writer, metrics_file, metrics_interval, metrics_key, &message_count);
 
 	scribeWrapper client(host, port, timeout, category, debug, log);
 	while(std::cin) {
